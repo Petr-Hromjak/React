@@ -1,0 +1,12 @@
+.cookbookPage {
+  padding: 40px 0 40px 0;
+  max-width: 1140px;
+  margin: auto;
+}
+
+.cookbookNameHeader {
+  text-align: center;
+  background-color: #96658d;
+  padding: 4px 12px;
+  border-radius: 8px;
+}

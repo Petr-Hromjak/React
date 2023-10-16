@@ -1,0 +1,38 @@
+.recipe {
+  margin: 15px 0 15px;
+}
+
+.recipeBody {
+  display: flex;
+}
+
+.recipeName {
+  font-weight: bold;
+  padding: 4px 12px;
+  text-align: left;
+}
+
+.recipeDescription {
+  display: flex;
+}
+
+.recipeDescriptionIcon {
+  width: 5%;
+  padding: 4px 12px;
+  text-align: left;
+}
+
+.recipeDescriptionText {
+  width: 95%;
+  padding: 4px 12px;
+  text-align: left;
+}
+
+.recipeContent {
+  width: 65%;
+}
+
+.recipeImage {
+  width: 35%;
+  object-fit: cover;
+}
