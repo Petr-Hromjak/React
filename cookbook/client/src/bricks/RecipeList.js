@@ -43,9 +43,9 @@ function RecipeList(props) {
   function switchView(viewType) {
     switch (viewType) {
       case ViewState.BIG_GRID:
-        return <RecipeGridList recipeList={filteredRecipeList} isBigCard={true}/>;
+        return <RecipeGridList recipeList={filteredRecipeList} ingredientList={props.ingredientList} isBigCard={true}/>;
       case ViewState.SMALL_GRID:
-        return <RecipeGridList recipeList={filteredRecipeList} isBigCard={false}/>;
+        return <RecipeGridList recipeList={filteredRecipeList} ingredientList={props.ingredientList} isBigCard={false}/>;
       case ViewState.TABLE:
         return <RecipeTableList recipeList={filteredRecipeList}/>;
       default:

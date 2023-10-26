@@ -5,3 +5,8 @@
 .searchButton {
   margin-right: 8px;
 }
+
+.studentList {
+  max-width: 100%;
+  overflow: auto;
+}

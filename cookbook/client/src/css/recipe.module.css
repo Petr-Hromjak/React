@@ -17,6 +17,7 @@
 }
 
 .smallRecipeCard {
+  min-height: 465px;
   padding: 5px;
 }
 
@@ -70,6 +71,11 @@
 
 .recipeContent {
   width: 65%;
+}
+
+.ingredientsList {
+  padding:  0 20px;
+  text-align: left;
 }
 
 .bigRecipeImage {

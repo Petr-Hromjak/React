@@ -5,17 +5,17 @@ import RecipeSmallCard from "./RecipeSmallCard";
 
 class RecipeGridList extends React.Component {
   render() {
-    function getRecipeList(recipeList, isBigCard) {
+    function getRecipeList(recipeList, ingredientList, isBigCard,) {
       return recipeList.map((recipe) => {
         if (isBigCard) {
-          return <RecipeBigCard key={recipe.id} recipe={recipe}/>;
+          return <RecipeBigCard key={recipe.id} recipe={recipe} ingredientList={ingredientList}/>;
         } else {
-          return <RecipeSmallCard key={recipe.id} recipe={recipe}/>;
+          return <RecipeSmallCard key={recipe.id} recipe={recipe} ingredientList={ingredientList}/>;
         }
       });
     }
 
-    return getRecipeList(this.props.recipeList, this.props.isBigCard);
+    return getRecipeList(this.props.recipeList, this.props.ingredientList, this.props.isBigCard);
   }
 }
 

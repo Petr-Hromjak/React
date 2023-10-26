@@ -2,48 +2,67 @@ import "./App.css";
 import ClassroomInfo from "./bricks/ClassroomInfo";
 import StudentList from "./bricks/StudentList";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { useState, useEffect } from "react";
+import Icon from "@mdi/react";
+import { mdiLoading } from "@mdi/js";
+import styles from "./css/classroom.module.css";
 
-const classroom = {
-  name: "Septima",
+const CallState = {
+  PENDING: 'pending',
+  SUCCESS: 'success',
+  ERROR: 'error',
 };
 
-const studentList = [
-  {
-    firstname: "Vilma",
-    surname: "Štefanová",
-    nationalId: "8560162963",
-    id: "8fd09f3f5e2b4326",
-    classroomId: "84d4e4261f30a2e5",
-  },
-  {
-    firstname: "Agáta",
-    surname: "Dittrichová",
-    nationalId: "7060084086",
-    id: "d6518140a5d6e2d0",
-    classroomId: "1e838cb06cfeb01c",
-  },
-  {
-    firstname: "Ludmila",
-    surname: "Plašilová",
-    nationalId: "9155177614",
-    id: "6797c49e1a286d52",
-    classroomId: "f780b198cf290778",
-  },
-  {
-    firstname: "Saskie",
-    surname: "Mertová",
-    nationalId: "7651117815",
-    id: "2862a7b1abf33eed",
-    classroomId: "3aa1b99e902f5175",
-  },
-];
-
 function App() {
+  const [classroomLoadCall, setClassroomLoadCall] = useState({
+    state: CallState.PENDING,
+  });
+
+  useEffect(() => {
+    fetch(`http://localhost:3000/classroom/load?id=${"f780b198cf290778"}`, {
+      method: "GET",
+    }).then(async (response) => {
+      const responseJson = await response.json();
+      if (response.status >= 400) {
+        setClassroomLoadCall({ state: CallState.ERROR, error: responseJson });
+      } else {
+        setClassroomLoadCall({ state: CallState.SUCCESS, data: responseJson });
+      }
+    });
+  }, []);
+
+  function getChild() {
+    switch (classroomLoadCall.state) {
+      case CallState.PENDING:
+        return (
+            <div className={styles.loading}>
+              <Icon size={2} path={mdiLoading} spin={true}/>
+            </div>
+        );
+      case CallState.SUCCESS:
+        return (
+            <>
+              <ClassroomInfo classroom={classroomLoadCall.data}/>
+              <StudentList classroom={classroomLoadCall.data}/>
+            </>
+        );
+      case CallState.ERROR:
+        return (
+            <div className={styles.error}>
+              <div>Nepodařilo se načíst data o třídě.</div>
+              <br/>
+              <pre>{JSON.stringify(classroomLoadCall.error, null, 2)}</pre>
+            </div>
+        );
+      default:
+        return null;
+    }
+  }
+
   return (
-    <div className="App">
-      <ClassroomInfo classroom={classroom} />
-      <StudentList studentList={studentList} />
-    </div>
+      <div className="App">
+        {getChild()}
+      </div>
   );
 }
 

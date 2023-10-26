@@ -3,36 +3,18 @@ import Card from "react-bootstrap/Card";
 import Icon from "@mdi/react";
 import {mdiChefHat, mdiReceipt} from "@mdi/js";
 import styles from "../css/recipe.module.css";
+import {shortenText} from "../helpers/common";
 
 class RecipeSmallCard extends React.Component {
 
   render() {
-    function shortenDescription(inputString, maxLength) {
-      if (inputString.length <= maxLength) {
-        return inputString; // No need to truncate
-      }
 
-      let result;
-      const lastSpaceIndex = inputString.lastIndexOf(' ', maxLength);
-      if (lastSpaceIndex !== -1) {
-        result = inputString.substring(0, lastSpaceIndex);
-      } else {
-        result = inputString.substring(0, maxLength);
-      }
-
-      const lastChar = result.at(result.length - 1);
-      if (lastChar === '.' || lastChar === ',') {
-        result = result.substring(0, result.length - 1)
-      }
-
-      return result + " ..."
-    }
 
     return (
         <div className={styles.smallRecipe}>
           <Card className={styles.smallRecipeCard}>
             <Card.Body className={styles.smallRecipeBody}>
-              <div /*className={styles.recipeContent}*/>
+              <div>
                 <h2 className={styles.smallRecipeName}>
                   <Icon path={mdiChefHat} size={1} color="grey"/>{" "}
                   {this.props.recipe.name}
@@ -43,7 +25,15 @@ class RecipeSmallCard extends React.Component {
                     <Icon path={mdiReceipt} size={1} color="grey"/>{" "}
                   </div>
                   <div className={styles.smallRecipeDescriptionText}>
-                    {shortenDescription(this.props.recipe.description, 80)}
+                    {shortenText(this.props.recipe.description, 70)}
+                    <ul className={styles.ingredientsList}>
+                      {this.props.recipe.ingredients.slice(0, 5).map((ingredient) =>{
+                            const foundIngredient = this.props.ingredientList.find((ingredientInList)=>ingredientInList.id === ingredient.id);
+                            return <li key={foundIngredient.id}>{foundIngredient.name}</li>;
+                          }
+                      )}
+                      {this.props.recipe.ingredients.length > 5 && <li>...</li>}
+                    </ul>
                   </div>
                 </div>
               </div>
