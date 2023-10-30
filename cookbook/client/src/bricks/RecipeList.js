@@ -40,12 +40,35 @@ function RecipeList(props) {
     if (!event.target.value) setSearchBy("");
   }
 
+  function getChild(viewType) {
+    return (
+        <div className="container">
+          {filteredRecipeList.length ? (
+              <div className="container">
+                <div className={"d-block d-md-none"}>
+                  <RecipeGridList recipeList={filteredRecipeList} ingredientList={props.ingredientList}
+                                  isBigCard={false}/>
+                </div>
+                <div className={"d-none d-md-block"}>
+                  {switchView(viewType)}
+                </div>
+              </div>
+          ) : (
+              <div style={{margin: "16px auto", textAlign: "center"}}>
+                Nejsou žádné recepty k zobrazení.
+              </div>
+          )}
+        </div>
+    );
+  }
+
   function switchView(viewType) {
     switch (viewType) {
       case ViewState.BIG_GRID:
         return <RecipeGridList recipeList={filteredRecipeList} ingredientList={props.ingredientList} isBigCard={true}/>;
       case ViewState.SMALL_GRID:
-        return <RecipeGridList recipeList={filteredRecipeList} ingredientList={props.ingredientList} isBigCard={false}/>;
+        return <RecipeGridList recipeList={filteredRecipeList} ingredientList={props.ingredientList}
+                               isBigCard={false}/>;
       case ViewState.TABLE:
         return <RecipeTableList recipeList={filteredRecipeList}/>;
       default:
@@ -94,10 +117,11 @@ function RecipeList(props) {
 
   return (
       <div>
-        <Navbar bg="light">
+        <Navbar collapseOnSelect expand="sm" bg="light">
           <div className="container-fluid">
             <Navbar.Brand>Seznam receptů</Navbar.Brand>
-            <div>
+            <Navbar.Toggle aria-controls="responsive-navbar-nav"/>
+            <Navbar.Collapse style={{justifyContent: "right"}}>
               <Form className="d-flex" onSubmit={handleSearch}>
                 <Form.Control
                     id={"searchInput"}
@@ -114,23 +138,24 @@ function RecipeList(props) {
                 >
                   <Icon size={1} path={mdiMagnify}/>
                 </Button>
-                <Button
-                    variant="outline-primary"
-                    onClick={() =>
-                        setViewType((currentState) => {
-                          return switchViewType(currentState);
-                        })
-                    }
-                >
-                  <Icon size={1} path={chooseIcon(viewType)}/>{" "}
-                  {chooseText(viewType)}
-                </Button>
               </Form>
-            </div>
+              <Button
+                  className={"d-none d-md-block"}
+                  variant="outline-primary"
+                  onClick={() =>
+                      setViewType((currentState) => {
+                        return switchViewType(currentState);
+                      })
+                  }
+              >
+                <Icon size={1} path={chooseIcon(viewType)}/>{" "}
+                {chooseText(viewType)}
+              </Button>
+            </Navbar.Collapse>
           </div>
         </Navbar>
         <div className={styles.recipeList}>
-          {switchView(viewType)}
+          {getChild(viewType)}
         </div>
       </div>
   );

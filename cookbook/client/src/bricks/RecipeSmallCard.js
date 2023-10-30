@@ -2,7 +2,6 @@ import React from "react";
 import Card from "react-bootstrap/Card";
 import Icon from "@mdi/react";
 import {mdiChefHat, mdiReceipt} from "@mdi/js";
-import styles from "../css/recipe.module.css";
 import {shortenText} from "../helpers/common";
 
 class RecipeSmallCard extends React.Component {
@@ -10,37 +9,38 @@ class RecipeSmallCard extends React.Component {
   render() {
 
 
-    return (
-        <div className={styles.smallRecipe}>
-          <Card className={styles.smallRecipeCard}>
-            <Card.Body className={styles.smallRecipeBody}>
-              <div>
-                <h2 className={styles.smallRecipeName}>
-                  <Icon path={mdiChefHat} size={1} color="grey"/>{" "}
-                  {this.props.recipe.name}
-                </h2>
-                <img alt={this.props.recipe.name} src={this.props.recipe.imgUri} className={styles.smallRecipeImage}/>
-                <div className={styles.recipeDescription}>
-                  <div className={styles.smallRecipeDescriptionIcon}>
-                    <Icon path={mdiReceipt} size={1} color="grey"/>{" "}
-                  </div>
-                  <div className={styles.smallRecipeDescriptionText}>
-                    {shortenText(this.props.recipe.description, 70)}
-                    <ul className={styles.ingredientsList}>
-                      {this.props.recipe.ingredients.slice(0, 5).map((ingredient) =>{
-                            const foundIngredient = this.props.ingredientList.find((ingredientInList)=>ingredientInList.id === ingredient.id);
-                            return <li key={foundIngredient.id}>{foundIngredient.name}</li>;
-                          }
-                      )}
-                      {this.props.recipe.ingredients.length > 5 && <li>...</li>}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </Card.Body>
-          </Card>
-        </div>
-    );
+    return (<Card>
+      <Card.Img className="card-img-top" alt={this.props.recipe.name} src={this.props.recipe.imgUri}/>
+      <Card.Body >
+        <Card.Title>
+          <div className="row no-gutters px-3">
+            <div className="col-2 p-1">
+              <Icon className="vertical-align-text-bottom" path={mdiChefHat} size={1} color="grey"/>
+            </div>
+            <div className="col-10 p-1">
+              {this.props.recipe.name}
+            </div>
+          </div>
+        </Card.Title>
+        <Card.Text >
+          <div className="row no-gutters px-3">
+            <div className="col-2 p-1">
+              <Icon className="vertical-align-text-bottom" path={mdiReceipt} size={1} color="grey"/>
+            </div>
+            <div className="col-10 p-1">
+              {shortenText(this.props.recipe.description, 70)}
+            </div>
+          </div>
+        </Card.Text>
+        <ul className="list-group">
+          {this.props.recipe.ingredients.slice(0, 5).map((ingredient) => {
+            const foundIngredient = this.props.ingredientList.find((ingredientInList) => ingredientInList.id === ingredient.id);
+            return <li className="list-group-item" key={foundIngredient.id}>{foundIngredient.name}</li>;
+          })}
+          {this.props.recipe.ingredients.length > 5 && <li className="list-group-item">atd.</li>}
+        </ul>
+      </Card.Body>
+    </Card>);
   }
 }
 

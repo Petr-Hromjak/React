@@ -77,7 +77,7 @@ function StudentList(props) {
       </Navbar>
       <div className={styles.studentList}>
         {filteredStudentList.length ? (
-          <div class="container">
+          <div className="container">
             <div className={"d-block d-md-none"}>
               <StudentGridList studentList={filteredStudentList} />
             </div>

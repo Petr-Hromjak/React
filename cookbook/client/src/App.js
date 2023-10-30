@@ -1,84 +1,52 @@
 import "./App.css";
-import CookbookInfo from "./bricks/CookbookInfo";
-import RecipeList from "./bricks/RecipeList";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {useState, useEffect} from "react";
-import Icon from "@mdi/react";
-import {mdiLoading} from "@mdi/js";
-import styles from "./css/cookbook.module.css";
-
-const CallState = {
-  PENDING: 'pending',
-  SUCCESS: 'success',
-  ERROR: 'error',
-};
+import { Outlet, useNavigate } from "react-router-dom";
+import Container from "react-bootstrap/Container";
+import Nav from "react-bootstrap/Nav";
+import Navbar from "react-bootstrap/Navbar";
+import Offcanvas from "react-bootstrap/Offcanvas";
+import Routes from "./routes/Routes";
 
 const cookbook = {
   name: "Rychlé a chutné večeře",
 };
 
 function App() {
-  const [recipeListCall, setRecipeListCall] = useState({
-    state: CallState.PENDING,
-  });
-  const [ingredientListCall, setIngredientListCall] = useState({
-    state: CallState.PENDING,
-  });
-
-  useEffect(() => {
-    fetch(`http://localhost:3000/recipe/list`, {
-      method: "GET",
-    }).then(async (response) => {
-      const responseJson = await response.json();
-      if (response.status >= 400) {
-        setRecipeListCall({state: CallState.ERROR, error: responseJson});
-      } else {
-        setRecipeListCall({state: CallState.SUCCESS, data: responseJson});
-      }
-    });
-  }, []);
-
-  useEffect(() => {
-    fetch(`http://localhost:3000/ingredient/list`, {
-      method: "GET",
-    }).then(async (response) => {
-      const responseJson = await response.json();
-      if (response.status >= 400) {
-        setIngredientListCall({state: CallState.ERROR, error: responseJson});
-      } else {
-        setIngredientListCall({state: CallState.SUCCESS, data: responseJson});
-      }
-    });
-  }, []);
-
-  function getChild() {
-    if (recipeListCall.state === CallState.SUCCESS && ingredientListCall.state === CallState.SUCCESS) {
-      return (
-          <div className={styles.cookbookPage}>
-            <CookbookInfo cookbook={cookbook}/>
-            <RecipeList recipeList={recipeListCall.data} ingredientList = {ingredientListCall.data}/>
-          </div>
-      );
-    } else if (recipeListCall.state === CallState.ERROR || ingredientListCall.state === CallState.ERROR) {
-      return (
-          <div className={styles.error}>
-            <div>Nepodařilo se načíst recepty nebo ingredience.</div>
-            <br/>
-            <pre>{JSON.stringify(recipeListCall.error + " " + ingredientListCall.error, null, 2)}</pre>
-          </div>
-      );
-    } else {
-      return (
-          <div className={styles.loading}>
-            <Icon size={2} path={mdiLoading} spin={true}/>
-          </div>
-      );
-    }
-  }
+  let navigate = useNavigate();
 
   return (
       <div className="App">
-        {getChild()}
+        <Navbar
+            fixed="top"
+            expand={"sm"}
+            className="mb-3"
+            bg="primary-subtle"
+        >
+          <Container fluid>
+            <Navbar.Brand onClick={() => navigate("/")}>
+              {cookbook.name}
+            </Navbar.Brand>
+            <Navbar.Toggle aria-controls={`offcanvasNavbar-expand-sm`} />
+            <Navbar.Offcanvas id={`offcanvasNavbar-expand-sm`}>
+              <Offcanvas.Header closeButton>
+                <Offcanvas.Title id={`offcanvasNavbarLabel-expand-sm`}>
+                  {cookbook.name}
+                </Offcanvas.Title>
+              </Offcanvas.Header>
+              <Offcanvas.Body>
+                <Nav className="justify-content-end flex-grow-1 pe-3">
+                  <Nav.Link>
+                    <button className="btn btn-primary" type="button" onClick={() => navigate(Routes.RECIPE_LIST)}>Recepty</button>
+                  </Nav.Link>
+                  <Nav.Link>
+                    <button className="btn btn-success" type="button" onClick={() => navigate(Routes.INGREDIENT_LIST)}>Ingredience</button>
+                  </Nav.Link>
+                </Nav>
+              </Offcanvas.Body>
+            </Navbar.Offcanvas>
+          </Container>
+        </Navbar>
+        <Outlet />
       </div>
   );
 }

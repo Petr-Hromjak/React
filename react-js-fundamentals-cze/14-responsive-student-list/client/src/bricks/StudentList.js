@@ -37,49 +37,58 @@ function StudentList(props) {
 
   return (
     <div>
-      <Navbar bg="light">
+      <Navbar collapseOnSelect expand="sm" bg="light">
         <div className="container-fluid">
           <Navbar.Brand>Seznam studentů</Navbar.Brand>
-          <div>
+          <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+          <Navbar.Collapse style={{ justifyContent: "right" }}>
             <Form className="d-flex" onSubmit={handleSearch}>
               <Form.Control
-                id={"searchInput"}
-                style={{ maxWidth: "150px" }}
-                type="search"
-                placeholder="Search"
-                aria-label="Search"
-                onChange={handleSearchDelete}
+                  id={"searchInput"}
+                  style={{ maxWidth: "150px" }}
+                  type="search"
+                  placeholder="Search"
+                  aria-label="Search"
+                  onChange={handleSearchDelete}
               />
               <Button
-                style={{ marginRight: "8px" }}
-                variant="outline-success"
-                type="submit"
+                  style={{ marginRight: "8px" }}
+                  variant="outline-success"
+                  type="submit"
               >
                 <Icon size={1} path={mdiMagnify} />
               </Button>
-              <Button
+            </Form>
+            <Button
+                className={"d-none d-md-block"}
                 variant="outline-primary"
                 onClick={() =>
-                  setViewType((currentState) => {
-                    if (currentState === "grid") return "table";
-                    else return "grid";
-                  })
+                    setViewType((currentState) => {
+                      if (currentState === "grid") return "table";
+                      else return "grid";
+                    })
                 }
-              >
-                <Icon size={1} path={isGrid ? mdiTable : mdiViewGridOutline} />{" "}
-                {isGrid ? "Tabulka" : "Grid"}
-              </Button>
-            </Form>
-          </div>
+            >
+              <Icon size={1} path={isGrid ? mdiTable : mdiViewGridOutline} />{" "}
+              {isGrid ? "Tabulka" : "Grid"}
+            </Button>
+          </Navbar.Collapse>
         </div>
       </Navbar>
       <div className={styles.studentList}>
         {filteredStudentList.length ? (
-          isGrid ? (
-            <StudentGridList studentList={filteredStudentList} />
-          ) : (
-            <StudentTableList studentList={filteredStudentList} />
-          )
+            <div className="container">
+              <div className={"d-block d-md-none"}>
+                <StudentGridList studentList={filteredStudentList}/>
+              </div>
+              <div className={"d-none d-md-block"}>
+                {isGrid ? (
+                    <StudentGridList studentList={filteredStudentList}/>
+                ) : (
+                    <StudentTableList studentList={filteredStudentList}/>
+                )}
+              </div>
+            </div>
         ) : (
           <div style={{ margin: "16px auto", textAlign: "center" }}>
             Nejsou žádní studenti ke zobrazení
