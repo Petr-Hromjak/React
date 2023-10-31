@@ -17,7 +17,9 @@ import { getColorByGrade } from "../helpers/common";
 
 function StudentSubjectGradeList({ student, subject, classroom }) {
   const [isModalShown, setShow] = useState(false);
-  const [addGradeShow, setAddGradeShow] = useState(false);
+  const [addGradeShow, setAddGradeShow] = useState({
+    state: false
+  });
   const [studentSubjectGradeListCall, setStudentSubjectGradeListCall] =
     useState({
       state: "pending",
@@ -25,13 +27,19 @@ function StudentSubjectGradeList({ student, subject, classroom }) {
 
   const handleShowModal = () => setShow(true);
   const handleCloseModal = () => setShow(false);
-  const handleAddGradeShow = () => setAddGradeShow(true);
+  const handleAddGradeShow = (data) => setAddGradeShow({ state: true, data });
 
   const handleGradeAdded = (grade) => {
     if (studentSubjectGradeListCall.state === "success") {
+      let gradeList = [...studentSubjectGradeListCall.data];
+
+      if (grade.id) {
+        gradeList = gradeList.filter((g) => g.id !== grade.id);
+      }
+
       setStudentSubjectGradeListCall({
         state: "success",
-        data: [...studentSubjectGradeListCall.data, grade]
+        data: [...gradeList, grade]
       });
     }
   }
@@ -152,6 +160,14 @@ function StudentSubjectGradeList({ student, subject, classroom }) {
                         >
                           {new Date(grade.dateTs).toLocaleDateString()}
                         </td>
+                        <td>
+                          <Icon
+                              size={0.8}
+                              path={mdiPencilOutline}
+                              style={{ color: 'orange', cursor: 'pointer' }}
+                              onClick={() => handleAddGradeShow(grade)}
+                          />
+                        </td>
                       </tr>
                     );
                   })}
@@ -209,6 +225,7 @@ function StudentSubjectGradeList({ student, subject, classroom }) {
         student={student}
         subject={subject}
         show={addGradeShow}
+        grade={addGradeShow.data}
         setAddGradeShow={setAddGradeShow}
         classroom={classroom}
         onComplete={(grade) => handleGradeAdded(grade)}

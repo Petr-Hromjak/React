@@ -18,8 +18,14 @@ function Cookbook() {
 
   const handleRecipeCreated = (recipe) => {
     if (recipeListCall.state === CallState.SUCCESS) {
+      let recipeList = [...recipeListCall.data];
+
+      if (recipe.id) {
+        recipeList = recipeList.filter((r) => r.id !== recipe.id);
+      }
+
       setRecipeListCall({
-        state: CallState.SUCCESS, data: [...recipeListCall.data, recipe]
+        state: CallState.SUCCESS, data: [...recipeList, recipe]
       });
     }
   }

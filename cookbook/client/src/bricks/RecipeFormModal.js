@@ -1,5 +1,5 @@
 import {Modal, Form, Row, Col, Button, Image} from "react-bootstrap";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import Icon from "@mdi/react";
 import {mdiDelete, mdiLoading} from "@mdi/js";
 
@@ -7,7 +7,7 @@ const CallState = {
   INACTIVE: 'inactive', PENDING: 'pending', SUCCESS: 'success', ERROR: 'error',
 };
 
-function RecipeCreateModal({ingredientList, show, setAddRecipeShow, onComplete}) {
+function RecipeFormModal({ingredientList, show, recipe, setAddRecipeShow, onComplete}) {
   const initialFormData = {
     name: "", description: "", imgUri: "", ingredients: []
   }
@@ -17,8 +17,18 @@ function RecipeCreateModal({ingredientList, show, setAddRecipeShow, onComplete})
     state: CallState.INACTIVE
   });
 
+  useEffect(() => {
+    if (recipe) {
+      setFormData({
+        name: recipe.name, description: recipe.description, imgUri: recipe.imgUri, ingredients: recipe.ingredients
+      });
+    } else {
+      setFormData(initialFormData);
+    }
+  }, [recipe]);
+
   const handleClose = () => {
-    setAddRecipeShow(false);
+    setAddRecipeShow({state: false});
     setValidated(false);
     setFormData(initialFormData);
   }
@@ -67,7 +77,7 @@ function RecipeCreateModal({ingredientList, show, setAddRecipeShow, onComplete})
 
   const setIngredientAmount = (ingredient, amount) => {
     return setFormData((formData) => {
-      const newData = {...formData};
+      const newData = JSON.parse(JSON.stringify(formData));
       const foundIngredient = newData.ingredients.find((savedIngredient) => savedIngredient.id === ingredient.id);
       if (foundIngredient) {
         foundIngredient.amount = amount;
@@ -83,7 +93,7 @@ function RecipeCreateModal({ingredientList, show, setAddRecipeShow, onComplete})
     e.stopPropagation();
 
     const payload = {
-      ...formData,
+      ...formData, id: recipe ? recipe.id : null
     };
 
     if (!form.checkValidity()) {
@@ -92,7 +102,7 @@ function RecipeCreateModal({ingredientList, show, setAddRecipeShow, onComplete})
     }
 
     setAddRecipeCall({state: CallState.PENDING});
-    const res = await fetch(`http://localhost:8000/recipe/create`, {
+    const res = await fetch(`http://localhost:8000/recipe/${recipe ? 'update' : 'create'}`, {
       method: "POST", headers: {
         "Content-Type": "application/json",
       }, body: JSON.stringify(payload)
@@ -117,7 +127,7 @@ function RecipeCreateModal({ingredientList, show, setAddRecipeShow, onComplete})
     <Modal className={"modal-lg"} show={show} onHide={handleClose}>
       <Form noValidate validated={validated} onSubmit={(e) => handleSubmit(e)}>
         <Modal.Header closeButton>
-          <Modal.Title>Vytvořit nový recept</Modal.Title>
+          <Modal.Title>{recipe ? 'Upravit recept' : 'Vytvořit nový recept'}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form.Group className="mb-3">
@@ -186,8 +196,9 @@ function RecipeCreateModal({ingredientList, show, setAddRecipeShow, onComplete})
                       value={formData.ingredients.find((savedIngredient) => savedIngredient.id === ingredient.id).amount}
                       placeholder={0}
                       onChange={(e) => setIngredientAmount(ingredient, e.target.value)}
-                      min={1}
+                      min={0.01}
                       max={10000}
+                      step={".01"}
                       required
                   />
                   <Form.Control.Feedback type="invalid">
@@ -234,7 +245,7 @@ function RecipeCreateModal({ingredientList, show, setAddRecipeShow, onComplete})
               </Button>
               <Button variant="primary" type="submit" disabled={addRecipeCall.state === CallState.PENDING}>
                 {addRecipeCall.state === CallState.PENDING ? (
-                    <Icon size={0.8} path={mdiLoading} spin={true}/>) : ("Vytvořit")}
+                    <Icon size={0.8} path={mdiLoading} spin={true}/>) : (recipe ? 'Upravit' : 'Vytvořit')}
               </Button>
             </div>
           </div>
@@ -244,4 +255,4 @@ function RecipeCreateModal({ingredientList, show, setAddRecipeShow, onComplete})
   </>)
 }
 
-export default RecipeCreateModal;
+export default RecipeFormModal;

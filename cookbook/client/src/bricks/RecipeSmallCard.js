@@ -1,7 +1,7 @@
 import React from "react";
 import Card from "react-bootstrap/Card";
 import Icon from "@mdi/react";
-import {mdiChefHat, mdiReceipt} from "@mdi/js";
+import {mdiChefHat, mdiPencilOutline, mdiReceipt} from "@mdi/js";
 import {shortenText} from "../helpers/common";
 
 class RecipeSmallCard extends React.Component {
@@ -10,6 +10,14 @@ class RecipeSmallCard extends React.Component {
 
 
     return (<Card>
+      <Card.Header>
+        <Icon
+            size={0.8}
+            path={mdiPencilOutline}
+            style={{ color: 'orange', cursor: 'pointer' }}
+            onClick={() => this.props.handleAddRecipeShow(this.props.recipe)}
+        />
+      </Card.Header>
       <Card.Img className="card-img-top" alt={this.props.recipe.name} src={this.props.recipe.imgUri}/>
       <Card.Body >
         <Card.Title>

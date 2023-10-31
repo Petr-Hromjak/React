@@ -5,14 +5,16 @@ import RecipeSmallCard from "./RecipeSmallCard";
 
 class RecipeGridList extends React.Component {
   render() {
-    function getRecipeList(recipeList, ingredientList, isBigCard) {
+    function getRecipeList(recipeList, ingredientList,handleAddRecipeShow, isBigCard) {
 
       if (isBigCard) {
         return (<div className="row">
           {recipeList.map((recipe) => <div className="col-12 d-flex"
                                            style={{paddingBottom: "16px"}}>
             <RecipeBigCard key={recipe.id} recipe={recipe}
-                           ingredientList={ingredientList}/>
+                           ingredientList={ingredientList}
+                           handleAddRecipeShow={handleAddRecipeShow}
+            />
           </div>)}
         </div>);
       } else {
@@ -21,13 +23,15 @@ class RecipeGridList extends React.Component {
                                            style={{paddingBottom: "16px"}}>
             <RecipeSmallCard key={recipe.id}
                              recipe={recipe}
-                             ingredientList={ingredientList}/>
+                             ingredientList={ingredientList}
+                             handleAddRecipeShow={handleAddRecipeShow}
+            />
           </div>)}
         </div>);
       }
     }
 
-    return getRecipeList(this.props.recipeList, this.props.ingredientList, this.props.isBigCard);
+    return getRecipeList(this.props.recipeList, this.props.ingredientList, this.props.handleAddRecipeShow, this.props.isBigCard);
   }
 }
 

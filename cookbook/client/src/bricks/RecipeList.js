@@ -9,7 +9,7 @@ import Form from "react-bootstrap/Form";
 
 import Icon from "@mdi/react";
 import {mdiTable, mdiViewGridOutline, mdiMagnify, mdiPlus} from "@mdi/js";
-import RecipeCreateModal from "./RecipeCreateModal";
+import RecipeFormModal from "./RecipeFormModal";
 
 const ViewState = {
   BIG_GRID: 'big_grid', SMALL_GRID: 'small_grid', TABLE: 'table',
@@ -18,8 +18,9 @@ const ViewState = {
 function RecipeList(props) {
   const [viewType, setViewType] = useState(ViewState.BIG_GRID);
   const [searchBy, setSearchBy] = useState("");
-  const [addRecipeShow, setAddRecipeShow] = useState(false);
-
+  const [addRecipeShow, setAddRecipeShow] = useState({
+    state: false
+  });
   const filteredRecipeList = useMemo(() => {
     return props.recipeList.filter((item) => {
       return (item.name
@@ -37,7 +38,7 @@ function RecipeList(props) {
     if (!event.target.value) setSearchBy("");
   }
 
-  const handleAddRecipeShow = () => setAddRecipeShow(true);
+  const handleAddRecipeShow = (data) => setAddRecipeShow({state: true, data});
 
   function getChild(viewType) {
     return (<div className="container">
@@ -58,14 +59,16 @@ function RecipeList(props) {
   function switchView(viewType) {
     switch (viewType) {
       case ViewState.BIG_GRID:
-        return <RecipeGridList recipeList={filteredRecipeList} ingredientList={props.ingredientList} isBigCard={true}/>;
+        return <RecipeGridList recipeList={filteredRecipeList} ingredientList={props.ingredientList}
+                               handleAddRecipeShow={handleAddRecipeShow} isBigCard={true}/>;
       case ViewState.SMALL_GRID:
         return <RecipeGridList recipeList={filteredRecipeList} ingredientList={props.ingredientList}
-                               isBigCard={false}/>;
+                               handleAddRecipeShow={handleAddRecipeShow} isBigCard={false}/>;
       case ViewState.TABLE:
-        return <RecipeTableList recipeList={filteredRecipeList}/>;
+        return <RecipeTableList recipeList={filteredRecipeList} handleAddRecipeShow={handleAddRecipeShow}/>;
       default:
-        return <RecipeGridList recipeList={filteredRecipeList} isBigCard={true}/>;
+        return <RecipeGridList recipeList={filteredRecipeList} handleAddRecipeShow={handleAddRecipeShow}
+                               isBigCard={true}/>;
     }
   }
 
@@ -168,9 +171,10 @@ function RecipeList(props) {
         {getChild(viewType)}
       </div>
     </div>
-    <RecipeCreateModal
+    <RecipeFormModal
         ingredientList={props.ingredientList}
-        show={addRecipeShow}
+        show={addRecipeShow.state}
+        recipe={addRecipeShow.data}
         setAddRecipeShow={setAddRecipeShow}
         onComplete={(recipe) => props.onComplete(recipe)}
 
