@@ -8,26 +8,23 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 
 import Icon from "@mdi/react";
-import {mdiTable, mdiViewGridOutline, mdiMagnify} from "@mdi/js";
+import {mdiTable, mdiViewGridOutline, mdiMagnify, mdiPlus} from "@mdi/js";
+import RecipeCreateModal from "./RecipeCreateModal";
 
 const ViewState = {
-  BIG_GRID: 'big_grid',
-  SMALL_GRID: 'small_grid',
-  TABLE: 'table',
+  BIG_GRID: 'big_grid', SMALL_GRID: 'small_grid', TABLE: 'table',
 };
 
 function RecipeList(props) {
   const [viewType, setViewType] = useState(ViewState.BIG_GRID);
   const [searchBy, setSearchBy] = useState("");
+  const [addRecipeShow, setAddRecipeShow] = useState(false);
 
   const filteredRecipeList = useMemo(() => {
     return props.recipeList.filter((item) => {
-      return (
-          item.name
-              .toLocaleLowerCase()
-              .includes(searchBy.toLocaleLowerCase()) ||
-          item.description.toLocaleLowerCase().includes(searchBy.toLocaleLowerCase())
-      );
+      return (item.name
+          .toLocaleLowerCase()
+          .includes(searchBy.toLocaleLowerCase()) || item.description.toLocaleLowerCase().includes(searchBy.toLocaleLowerCase()));
     });
   }, [props.recipeList, searchBy]);
 
@@ -40,26 +37,23 @@ function RecipeList(props) {
     if (!event.target.value) setSearchBy("");
   }
 
+  const handleAddRecipeShow = () => setAddRecipeShow(true);
+
+
   function getChild(viewType) {
-    return (
-        <div className="container">
-          {filteredRecipeList.length ? (
-              <div className="container">
-                <div className={"d-block d-md-none"}>
-                  <RecipeGridList recipeList={filteredRecipeList} ingredientList={props.ingredientList}
-                                  isBigCard={false}/>
-                </div>
-                <div className={"d-none d-md-block"}>
-                  {switchView(viewType)}
-                </div>
-              </div>
-          ) : (
-              <div style={{margin: "16px auto", textAlign: "center"}}>
-                Nejsou žádné recepty k zobrazení.
-              </div>
-          )}
+    return (<div className="container">
+      {filteredRecipeList.length ? (<div className="container">
+        <div className={"d-block d-md-none"}>
+          <RecipeGridList recipeList={filteredRecipeList} ingredientList={props.ingredientList}
+                          isBigCard={false}/>
         </div>
-    );
+        <div className={"d-none d-md-block"}>
+          {switchView(viewType)}
+        </div>
+      </div>) : (<div style={{margin: "16px auto", textAlign: "center"}}>
+        Nejsou žádné recepty k zobrazení.
+      </div>)}
+    </div>);
   }
 
   function switchView(viewType) {
@@ -115,50 +109,72 @@ function RecipeList(props) {
     }
   }
 
-  return (
-      <div>
-        <Navbar collapseOnSelect expand="sm" bg="light">
-          <div className="container-fluid">
-            <Navbar.Brand>Seznam receptů</Navbar.Brand>
-            <Navbar.Toggle aria-controls="responsive-navbar-nav"/>
-            <Navbar.Collapse style={{justifyContent: "right"}}>
-              <Form className="d-flex" onSubmit={handleSearch}>
-                <Form.Control
-                    id={"searchInput"}
-                    style={{maxWidth: "150px"}}
-                    type="search"
-                    placeholder="Search"
-                    aria-label="Search"
-                    onChange={handleSearchDelete}
-                />
-                <Button
-                    style={{marginRight: "8px"}}
-                    variant="outline-success"
-                    type="submit"
-                >
-                  <Icon size={1} path={mdiMagnify}/>
-                </Button>
-              </Form>
+  return (<>
+    <div>
+      <Navbar collapseOnSelect expand="sm" bg="light">
+        <div className="container-fluid">
+          <Navbar.Brand>Seznam receptů</Navbar.Brand>
+          <Navbar.Toggle aria-controls="responsive-navbar-nav"/>
+          <Navbar.Collapse style={{justifyContent: "right"}}>
+            <Form className="d-flex" onSubmit={handleSearch}>
+              <Form.Control
+                  id={"searchInput"}
+                  style={{maxWidth: "150px"}}
+                  type="search"
+                  placeholder="Search"
+                  aria-label="Search"
+                  onChange={handleSearchDelete}
+              />
+              <Button
+                  style={{marginRight: "8px"}}
+                  variant="outline-success"
+                  type="submit"
+              >
+                <Icon size={1} style={{verticalAlign: "top"}} path={mdiMagnify}/>
+              </Button>
+              <Button style={{marginRight: "8px"}}
+                      variant="outline-success"
+                      onClick={handleAddRecipeShow}
+              >
+                <div className={"row no-gutters "}>
+                  <div className={"col-sm-12 col-md-2 px-md-1"}>
+                    <Icon size={1} style={{verticalAlign: "top"}} path={mdiPlus}/>
+                  </div>
+                  <div className={"col-md-10 px-1 d-none d-md-block"}>
+                    Vytvořit
+                  </div>
+                </div>
+              </Button>
               <Button
                   className={"d-none d-md-block"}
                   variant="outline-primary"
-                  onClick={() =>
-                      setViewType((currentState) => {
-                        return switchViewType(currentState);
-                      })
-                  }
+                  onClick={() => setViewType((currentState) => {
+                    return switchViewType(currentState);
+                  })}
               >
-                <Icon size={1} path={chooseIcon(viewType)}/>{" "}
-                {chooseText(viewType)}
+                <div className={"row no-gutters "}>
+                  <div className={"col-sm-2 p-1"}>
+                    <Icon size={1} style={{verticalAlign: "top"}} path={chooseIcon(viewType)}/>
+                  </div>
+                  <div className={"col-sm-10 p-1"}>
+                    {chooseText(viewType)}
+                  </div>
+                </div>
               </Button>
-            </Navbar.Collapse>
-          </div>
-        </Navbar>
-        <div className={styles.recipeList}>
-          {getChild(viewType)}
+            </Form>
+          </Navbar.Collapse>
         </div>
+      </Navbar>
+      <div className={styles.recipeList}>
+        {getChild(viewType)}
       </div>
-  );
+    </div>
+    <RecipeCreateModal
+        ingredientList={props.ingredientList}
+        show={addRecipeShow}
+        setAddRecipeShow={setAddRecipeShow}
+    />
+  </>);
 }
 
 export default RecipeList;
