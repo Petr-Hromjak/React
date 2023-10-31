@@ -39,7 +39,6 @@ function RecipeList(props) {
 
   const handleAddRecipeShow = () => setAddRecipeShow(true);
 
-
   function getChild(viewType) {
     return (<div className="container">
       {filteredRecipeList.length ? (<div className="container">
@@ -173,6 +172,8 @@ function RecipeList(props) {
         ingredientList={props.ingredientList}
         show={addRecipeShow}
         setAddRecipeShow={setAddRecipeShow}
+        onComplete={(recipe) => props.onComplete(recipe)}
+
     />
   </>);
 }

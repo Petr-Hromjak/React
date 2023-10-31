@@ -1,26 +1,32 @@
 import {Modal, Form, Row, Col, Button, Image} from "react-bootstrap";
 import React, {useState} from "react";
 import Icon from "@mdi/react";
-import {mdiDelete} from "@mdi/js";
+import {mdiDelete, mdiLoading} from "@mdi/js";
 
+const CallState = {
+  INACTIVE: 'inactive', PENDING: 'pending', SUCCESS: 'success', ERROR: 'error',
+};
 
-function RecipeCreateModal({ingredientList, show, setAddRecipeShow}) {
+function RecipeCreateModal({ingredientList, show, setAddRecipeShow, onComplete}) {
   const initialFormData = {
     name: "", description: "", imgUri: "", ingredients: []
   }
-
-  const [formData, setFormData] = useState({
-    name: "", description: "", imgUri: "", ingredients: []
+  const [validated, setValidated] = useState(false);
+  const [formData, setFormData] = useState(initialFormData);
+  const [addRecipeCall, setAddRecipeCall] = useState({
+    state: CallState.INACTIVE
   });
+
   const handleClose = () => {
     setAddRecipeShow(false);
+    setValidated(false);
     setFormData(initialFormData);
   }
 
   function handleRemoveIngredient(ingredient) {
     return setFormData((formData) => {
       const newData = {...formData};
-      const index = newData.ingredients.findIndex((savedIngredient)=>savedIngredient.id === ingredient.id);
+      const index = newData.ingredients.findIndex((savedIngredient) => savedIngredient.id === ingredient.id);
       if (index > -1) {
         newData.ingredients.splice(index, 1);
       }
@@ -36,12 +42,12 @@ function RecipeCreateModal({ingredientList, show, setAddRecipeShow}) {
     });
   };
 
-  const setIngredientsField = ( ingredientId) => {
+  const setIngredientsField = (ingredientId) => {
     return setFormData((formData) => {
       const newData = JSON.parse(JSON.stringify(formData));
-      const index = newData.ingredients.findIndex((savedIngredient)=>savedIngredient.id === ingredientId);
+      const index = newData.ingredients.findIndex((savedIngredient) => savedIngredient.id === ingredientId);
       if (index <= -1) {
-        newData.ingredients.push({id:ingredientId, amount:0, unit:"ks"})
+        newData.ingredients.push({id: ingredientId, amount: 0, unit: "ks"})
       }
 
       return newData;
@@ -51,7 +57,7 @@ function RecipeCreateModal({ingredientList, show, setAddRecipeShow}) {
   const setIngredientUnit = (ingredient, unit) => {
     return setFormData((formData) => {
       const newData = JSON.parse(JSON.stringify(formData));
-      const foundIngredient = newData.ingredients.find((savedIngredient)=>savedIngredient.id === ingredient.id);
+      const foundIngredient = newData.ingredients.find((savedIngredient) => savedIngredient.id === ingredient.id);
       if (foundIngredient) {
         foundIngredient.unit = unit;
       }
@@ -62,7 +68,7 @@ function RecipeCreateModal({ingredientList, show, setAddRecipeShow}) {
   const setIngredientAmount = (ingredient, amount) => {
     return setFormData((formData) => {
       const newData = {...formData};
-      const foundIngredient = newData.ingredients.find((savedIngredient)=>savedIngredient.id === ingredient.id);
+      const foundIngredient = newData.ingredients.find((savedIngredient) => savedIngredient.id === ingredient.id);
       if (foundIngredient) {
         foundIngredient.amount = amount;
       }
@@ -71,6 +77,8 @@ function RecipeCreateModal({ingredientList, show, setAddRecipeShow}) {
   };
 
   const handleSubmit = async (e) => {
+    const form = e.currentTarget;
+
     e.preventDefault();
     e.stopPropagation();
 
@@ -78,12 +86,36 @@ function RecipeCreateModal({ingredientList, show, setAddRecipeShow}) {
       ...formData,
     };
 
-    console.log(payload);
+    if (!form.checkValidity()) {
+      setValidated(true);
+      return;
+    }
+
+    setAddRecipeCall({state: CallState.PENDING});
+    const res = await fetch(`http://localhost:8000/recipe/create`, {
+      method: "POST", headers: {
+        "Content-Type": "application/json",
+      }, body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+
+    if (res.status >= 400) {
+      setAddRecipeCall({state: CallState.ERROR, error: data});
+    } else {
+      setAddRecipeCall({state: CallState.SUCCESS, data});
+
+      if (typeof onComplete === 'function') {
+        onComplete(data);
+      }
+
+      handleClose();
+    }
   };
 
   return (<>
-    <Modal show={show} onHide={handleClose}>
-      <Form onSubmit={(e) => handleSubmit(e)}>
+    <Modal className={"modal-lg"} show={show} onHide={handleClose}>
+      <Form noValidate validated={validated} onSubmit={(e) => handleSubmit(e)}>
         <Modal.Header closeButton>
           <Modal.Title>Vytvořit nový recept</Modal.Title>
         </Modal.Header>
@@ -94,7 +126,12 @@ function RecipeCreateModal({ingredientList, show, setAddRecipeShow}) {
                 type="text"
                 value={formData.name}
                 onChange={(e) => setField("name", e.target.value)}
+                required
+                maxLength={20}
             />
+            <Form.Control.Feedback type="invalid">
+              Zadejte název receptu s maximální délkou 20 znaků
+            </Form.Control.Feedback>
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>Popis</Form.Label>
@@ -102,7 +139,12 @@ function RecipeCreateModal({ingredientList, show, setAddRecipeShow}) {
                 type="text"
                 value={formData.description}
                 onChange={(e) => setField("description", e.target.value)}
+                required
+                maxLength={10000}
             />
+            <Form.Control.Feedback type="invalid">
+              Zadejte popis s maximální délkou 10000 znaků
+            </Form.Control.Feedback>
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>Obrázek</Form.Label>
@@ -110,9 +152,13 @@ function RecipeCreateModal({ingredientList, show, setAddRecipeShow}) {
                 type="text"
                 value={formData.imgUri}
                 onChange={(e) => setField("imgUri", e.target.value)}
+                required
             />
             {formData.imgUri && <Image className="img-fluid rounded mx-auto d-block m-3" alt={formData.name}
                                        src={formData.imgUri}/>}
+            <Form.Control.Feedback type="invalid">
+              Zadejte obrázek pomocí jeho URI adresy
+            </Form.Control.Feedback>
           </Form.Group>
 
 
@@ -122,53 +168,75 @@ function RecipeCreateModal({ingredientList, show, setAddRecipeShow}) {
                 value={""}
                 onChange={(e) => setIngredientsField(e.target.value)}
             >
-              <option value="" selected disabled>Vyber ingredienci k přidání</option>
+              <option value="" disabled>Vyber ingredienci k přidání</option>
               {ingredientList.map((ingredient) => <option value={ingredient.id}>{ingredient.name}</option>)}
             </Form.Select>
           </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Ingredience</Form.Label>
-            {formData?.ingredients && formData.ingredients.map((ingredient) => <Row>
-              <Form.Label
-                  className={"col-sm-2 col-form-label"}>{ingredientList.find((savedIngredient) => savedIngredient.id === ingredient.id).name}</Form.Label>
-              <Form.Label className={"col-sm-2 col-form-label"}>Množství</Form.Label>
-              <div className="col-sm-2">
-                <Form.Control
-                    type="number"
-                    value={formData.ingredients.find((savedIngredient) => savedIngredient.id === ingredient.id).amount}
-                    placeholder={0}
-                    onChange={(e) => setIngredientAmount(ingredient, e.target.value)}
-                />
-              </div>
-              <Form.Label className={"col-sm-2 col-form-label"}>Jednotky</Form.Label>
-              <div className={"col-sm-3"}>
-                <Form.Select
-                    type="text"
-                    value={formData.ingredients.find((savedIngredient) => savedIngredient.id === ingredient.id).unit}
-                    onChange={(e) => setIngredientUnit(ingredient, e.target.value)}
-                >
-                  <option value="ks" selected>ks</option>
-                  <option value="kg" >kg</option>
-                </Form.Select>
-              </div>
-              <Button className={"col-sm-1"} variant="secondary"
-                      onClick={() => handleRemoveIngredient(ingredient)}>
-                <Icon size={1} style={{verticalAlign: "top"}} path={mdiDelete}/>
-              </Button>
+          <Form.Label>Ingredience</Form.Label>
+          {formData?.ingredients && formData.ingredients.map((ingredient) => <Row>
+            <Form.Label
+                className={"col-lg-3 col-form-label fw-bold"}>{ingredientList.find((savedIngredient) => savedIngredient.id === ingredient.id).name}</Form.Label>
+            <Form.Group className="mb-3 col-lg-4">
+              <Row>
+                <Form.Label className={"col-form-label col-lg-6"}>Množství</Form.Label>
+                <div className="col-lg-6">
+                  <Form.Control
+                      type="number"
+                      value={formData.ingredients.find((savedIngredient) => savedIngredient.id === ingredient.id).amount}
+                      placeholder={0}
+                      onChange={(e) => setIngredientAmount(ingredient, e.target.value)}
+                      min={1}
+                      max={10000}
+                      required
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    Zadejte množství v rozsahu 1 - 10000
+                  </Form.Control.Feedback>
+                </div>
+              </Row>
+            </Form.Group>
 
-            </Row>)}
+            <Form.Group className="mb-3 col-lg-4 ">
+              <Row>
+                <Form.Label className={"col-form-label col-lg-5"}>Jednotky</Form.Label>
+                <div className={"col-lg-7"}>
+                  <Form.Select
+                      type="text"
+                      value={formData.ingredients.find((savedIngredient) => savedIngredient.id === ingredient.id).unit}
+                      onChange={(e) => setIngredientUnit(ingredient, e.target.value)}
+                      required
+                  >
+                    <option value="ks">ks</option>
+                    <option value="kg">kg</option>
+                  </Form.Select>
+                </div>
+              </Row>
+            </Form.Group>
 
-          </Form.Group>
+            <Button className={"col-lg-1"} variant="secondary"
+                    onClick={() => handleRemoveIngredient(ingredient)}>
+              <Icon size={1} style={{verticalAlign: "top"}} path={mdiDelete}/>
+            </Button>
+
+          </Row>)}
+
         </Modal.Body>
         <Modal.Footer>
-          <div className="d-flex flex-row gap-2">
-            <Button variant="secondary" onClick={handleClose}>
-              Zavřít
-            </Button>
-            <Button variant="primary" type="submit">
-              Vytvořit
-            </Button>
+          <div className="d-flex flex-row justify-content-between align-items-center w-100">
+            <div>
+              {addRecipeCall.state === CallState.ERROR &&
+                  <div className="text-danger">Error: {addRecipeCall.error.errorMessage}</div>}
+            </div>
+            <div className="d-flex flex-row gap-2">
+              <Button variant="secondary" onClick={handleClose}>
+                Zavřít
+              </Button>
+              <Button variant="primary" type="submit" disabled={addRecipeCall.state === CallState.PENDING}>
+                {addRecipeCall.state === CallState.PENDING ? (
+                    <Icon size={0.8} path={mdiLoading} spin={true}/>) : ("Vytvořit")}
+              </Button>
+            </div>
           </div>
         </Modal.Footer>
       </Form>
