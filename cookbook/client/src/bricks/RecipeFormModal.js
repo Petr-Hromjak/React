@@ -179,7 +179,7 @@ function RecipeFormModal({ingredientList, show, recipe, setAddRecipeShow, onComp
                 onChange={(e) => setIngredientsField(e.target.value)}
             >
               <option value="" disabled>Vyber ingredienci k přidání</option>
-              {ingredientList.map((ingredient) => <option value={ingredient.id}>{ingredient.name}</option>)}
+              {ingredientList.map((ingredient) => <option key={ingredient.id} value={ingredient.id}>{ingredient.name}</option>)}
             </Form.Select>
           </Form.Group>
 

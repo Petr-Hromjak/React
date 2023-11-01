@@ -12,12 +12,14 @@ import {
   mdiClose,
   mdiPencilOutline
 } from "@mdi/js";
-import { useState, useEffect, useMemo } from "react";
+import {useState, useEffect, useMemo, useContext} from "react";
 import { Modal, Table, Button, Alert } from "react-bootstrap";
 import { getColorByGrade } from "../helpers/common";
 import StudentGradeDelete from "./StudentGradeDelete";
+import UserContext from "./../UserProvider";
 
-function StudentSubjectGradeList({ student, subject, classroom }) {
+function StudentSubjectGradeList({ student, subject, classroom, disabled }) {
+  const { canEdit } = useContext(UserContext);
   const [isModalShown, setShow] = useState(false);
   const [addGradeShow, setAddGradeShow] = useState({
     state: false
@@ -28,7 +30,10 @@ function StudentSubjectGradeList({ student, subject, classroom }) {
     });
   const [deleteGradeError, setDeleteGradeError] = useState('');
 
-  const handleShowModal = () => setShow(true);
+  const handleShowModal = () => {
+    if (!disabled)
+      setShow(true);
+  };
   const handleCloseModal = () => setShow(false);
   const handleAddGradeShow = (data) => setAddGradeShow({ state: true, data });
 
@@ -180,20 +185,22 @@ function StudentSubjectGradeList({ student, subject, classroom }) {
                           {new Date(grade.dateTs).toLocaleDateString()}
                         </td>
                         <td>
-                          <div className="d-flex flex-row align-items-center gap-2">
-                            <Icon
-                              size={0.8}
-                              path={mdiPencilOutline}
-                              style={{ color: 'orange', cursor: 'pointer' }}
-                              onClick={() => handleAddGradeShow(grade)}
-                            />
+                          {canEdit() &&
+                              <div className="d-flex flex-row align-items-center gap-2">
+                                <Icon
+                                    size={0.8}
+                                    path={mdiPencilOutline}
+                                    style={{ color: 'orange', cursor: 'pointer' }}
+                                    onClick={() => handleAddGradeShow(grade)}
+                                />
 
-                            <StudentGradeDelete
-                              grade={grade}
-                              onDelete={(id) => handleGradeDeleted(id)}
-                              onError={(error) => setDeleteGradeError(error)}
-                            ></StudentGradeDelete>
-                          </div>
+                                <StudentGradeDelete
+                                    grade={grade}
+                                    onDelete={(id) => handleGradeDeleted(id)}
+                                    onError={(error) => setDeleteGradeError(error)}
+                                ></StudentGradeDelete>
+                              </div>
+                          }
                         </td>
                       </tr>
                     );
@@ -235,15 +242,17 @@ function StudentSubjectGradeList({ student, subject, classroom }) {
             >
               <Icon size={1} path={mdiReload}></Icon>
             </Button>
-            <Button
-              variant="success"
-              onClick={() => handleAddGradeShow()}
-            >
-              <div className="d-flex flex-row gap-1 align-items-center">
-                <Icon path={mdiPlus} size={1}></Icon>
-                <span>Přidat známku</span>
-              </div>
-            </Button>
+            {canEdit() &&
+                <Button
+                    variant="success"
+                    onClick={() => handleAddGradeShow()}
+                >
+                  <div className="d-flex flex-row gap-1 align-items-center">
+                    <Icon path={mdiPlus} size={1}></Icon>
+                    <span>Přidat známku</span>
+                  </div>
+                </Button>
+            }
           </div>
         </Modal.Footer>
       </Modal>
@@ -260,7 +269,10 @@ function StudentSubjectGradeList({ student, subject, classroom }) {
 
       <Icon
         path={mdiClipboardListOutline}
-        style={{ color: "grey", cursor: "pointer" }}
+        style={{
+          color: disabled ? 'lightgray' : "grey",
+          cursor: disabled ? "default" : "pointer"
+        }}
         size={1}
         onClick={handleShowModal}
       />

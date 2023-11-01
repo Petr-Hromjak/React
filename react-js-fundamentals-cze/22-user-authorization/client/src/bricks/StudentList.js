@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, {useState, useMemo, useContext} from "react";
 import StudentGridList from "./StudentGridList";
 import StudentTableList from "./StudentTableList";
 
@@ -9,14 +9,25 @@ import Form from "react-bootstrap/Form";
 import Icon from "@mdi/react";
 import { mdiTable, mdiViewGridOutline, mdiMagnify } from "@mdi/js";
 import styles from "../css/studentList.module.css";
+import UserContext from "./../UserProvider";
 
 function StudentList(props) {
+  const { user, isStudent, isParent } = useContext(UserContext);
+
   const [viewType, setViewType] = useState("grid");
   const isGrid = viewType === "grid";
   const [searchBy, setSearchBy] = useState("");
 
   const filteredStudentList = useMemo(() => {
     return props.classroom.studentList.filter((item) => {
+      if (isStudent()) {
+        return item.id === user.student.id;
+      }
+
+      if (isParent()) {
+        return user.students.some(student => student.id === item.id);
+      }
+
       return (
         item.firstname
           .toLocaleLowerCase()
@@ -24,7 +35,7 @@ function StudentList(props) {
         item.surname.toLocaleLowerCase().includes(searchBy.toLocaleLowerCase())
       );
     });
-  }, [searchBy, props.classroom.studentList]);
+  }, [searchBy, props.classroom.studentList, user]);
 
   function handleSearch(event) {
     event.preventDefault();

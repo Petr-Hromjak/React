@@ -1,4 +1,4 @@
-import React, {useState, useMemo} from "react";
+import React, {useState, useMemo, useContext} from "react";
 import RecipeGridList from "./RecipeGridList";
 import RecipeTableList from "./RecipeTableList";
 import styles from "../css/recipe.module.css";
@@ -10,12 +10,15 @@ import Form from "react-bootstrap/Form";
 import Icon from "@mdi/react";
 import {mdiTable, mdiViewGridOutline, mdiMagnify, mdiPlus} from "@mdi/js";
 import RecipeFormModal from "./RecipeFormModal";
+import UserContext from "./../UserProvider"
 
 const ViewState = {
   BIG_GRID: 'big_grid', SMALL_GRID: 'small_grid', TABLE: 'table',
 };
 
 function RecipeList(props) {
+  const {isAuthorized} = useContext(UserContext);
+
   const [viewType, setViewType] = useState(ViewState.BIG_GRID);
   const [searchBy, setSearchBy] = useState("");
   const [addRecipeShow, setAddRecipeShow] = useState({
@@ -151,7 +154,7 @@ function RecipeList(props) {
               >
                 <Icon size={1} style={{verticalAlign: "top"}} path={mdiMagnify}/>
               </Button>
-              <Button style={{marginRight: "8px"}}
+              {isAuthorized && <Button style={{marginRight: "8px"}}
                       variant="outline-success"
                       onClick={handleAddRecipeShow}
               >
@@ -163,7 +166,7 @@ function RecipeList(props) {
                     Vytvořit
                   </div>
                 </div>
-              </Button>
+              </Button>}
               <Button
                   className={"d-none d-md-block"}
                   variant="outline-primary"

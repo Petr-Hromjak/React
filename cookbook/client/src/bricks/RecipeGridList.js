@@ -8,7 +8,7 @@ class RecipeGridList extends React.Component {
 
       if (isBigCard) {
         return (<div className="row">
-          {recipeList.map((recipe) => <div className="col-12 d-flex"
+          {recipeList.map((recipe) => <div key={recipe.id} className="col-12 d-flex"
                                            style={{paddingBottom: "16px"}}>
             <RecipeBigCard key={recipe.id}
                            recipe={recipe}
@@ -21,7 +21,7 @@ class RecipeGridList extends React.Component {
         </div>);
       } else {
         return (<div className="row">
-          {recipeList.map((recipe) => <div className="col-12 col-md-6 col-xl-4 col-xxl-3 d-flex"
+          {recipeList.map((recipe) => <div key={recipe.id} className="col-12 col-md-6 col-xl-4 col-xxl-3 d-flex"
                                            style={{paddingBottom: "16px"}}>
             <RecipeSmallCard key={recipe.id}
                              recipe={recipe}
