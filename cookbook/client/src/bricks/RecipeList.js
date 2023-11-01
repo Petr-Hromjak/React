@@ -38,7 +38,9 @@ function RecipeList(props) {
     if (!event.target.value) setSearchBy("");
   }
 
-  const handleAddRecipeShow = (data) => setAddRecipeShow({state: true, data});
+  const handleAddRecipeShow = () => setAddRecipeShow({state: true});
+  const handleUpdateRecipeShow = (data) => setAddRecipeShow({state: true, data});
+
 
   function getChild(viewType) {
     return (<div className="container">
@@ -59,15 +61,30 @@ function RecipeList(props) {
   function switchView(viewType) {
     switch (viewType) {
       case ViewState.BIG_GRID:
-        return <RecipeGridList recipeList={filteredRecipeList} ingredientList={props.ingredientList}
-                               handleAddRecipeShow={handleAddRecipeShow} isBigCard={true}/>;
+        return <RecipeGridList recipeList={filteredRecipeList}
+                               ingredientList={props.ingredientList}
+                               handleAddRecipeShow={handleUpdateRecipeShow}
+                               onDelete={(id) => props.onDelete(id)}
+                               onError={(error) => props.onError(error)}
+                               isBigCard={true}/>;
       case ViewState.SMALL_GRID:
-        return <RecipeGridList recipeList={filteredRecipeList} ingredientList={props.ingredientList}
-                               handleAddRecipeShow={handleAddRecipeShow} isBigCard={false}/>;
+        return <RecipeGridList recipeList={filteredRecipeList}
+                               ingredientList={props.ingredientList}
+                               handleAddRecipeShow={handleUpdateRecipeShow}
+                               onDelete={(id) => props.onDelete(id)}
+                               onError={(error) => props.onError(error)}
+                               isBigCard={false}/>;
       case ViewState.TABLE:
-        return <RecipeTableList recipeList={filteredRecipeList} handleAddRecipeShow={handleAddRecipeShow}/>;
+        return <RecipeTableList recipeList={filteredRecipeList}
+                                handleAddRecipeShow={handleUpdateRecipeShow}
+                                onDelete={(id) => props.onDelete(id)}
+                                onError={(error) => props.onError(error)}/>;
       default:
-        return <RecipeGridList recipeList={filteredRecipeList} handleAddRecipeShow={handleAddRecipeShow}
+        return <RecipeGridList recipeList={filteredRecipeList}
+                               ingredientList={props.ingredientList}
+                               handleAddRecipeShow={handleUpdateRecipeShow}
+                               onDelete={(id) => props.onDelete(id)}
+                               onError={(error) => props.onError(error)}
                                isBigCard={true}/>;
     }
   }

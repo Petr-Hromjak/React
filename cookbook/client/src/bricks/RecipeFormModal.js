@@ -184,11 +184,11 @@ function RecipeFormModal({ingredientList, show, recipe, setAddRecipeShow, onComp
           </Form.Group>
 
           <Form.Label>Ingredience</Form.Label>
-          {formData?.ingredients && formData.ingredients.map((ingredient) => <Row>
+          {formData?.ingredients && formData.ingredients.map((ingredient) => <Row className="d-flex flex-row align-items-center mb-2">
             <Form.Label
                 className={"col-lg-3 col-form-label fw-bold"}>{ingredientList.find((savedIngredient) => savedIngredient.id === ingredient.id).name}</Form.Label>
-            <Form.Group className="mb-3 col-lg-4">
-              <Row>
+            <Form.Group className="col-lg-4">
+              <Row className="d-flex flex-row align-items-center">
                 <Form.Label className={"col-form-label col-lg-6"}>Množství</Form.Label>
                 <div className="col-lg-6">
                   <Form.Control
@@ -208,8 +208,8 @@ function RecipeFormModal({ingredientList, show, recipe, setAddRecipeShow, onComp
               </Row>
             </Form.Group>
 
-            <Form.Group className="mb-3 col-lg-4 ">
-              <Row>
+            <Form.Group className="col-lg-4">
+              <Row className="d-flex flex-row align-items-center">
                 <Form.Label className={"col-form-label col-lg-5"}>Jednotky</Form.Label>
                 <div className={"col-lg-7"}>
                   <Form.Select
@@ -225,10 +225,12 @@ function RecipeFormModal({ingredientList, show, recipe, setAddRecipeShow, onComp
               </Row>
             </Form.Group>
 
-            <Button className={"col-lg-1"} variant="secondary"
+            <div className={"col-lg-1"}>
+            <Button className={"w-100 d-flex justify-content-center align-items-center px-1"} variant="btn btn-outline-danger"
                     onClick={() => handleRemoveIngredient(ingredient)}>
               <Icon size={1} style={{verticalAlign: "top"}} path={mdiDelete}/>
             </Button>
+            </div>
 
           </Row>)}
 

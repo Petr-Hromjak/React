@@ -3,23 +3,14 @@ import Card from "react-bootstrap/Card";
 import Icon from "@mdi/react";
 import {mdiChefHat, mdiPencilOutline, mdiReceipt} from "@mdi/js";
 import {shortenText} from "../helpers/common";
+import RecipeDelete from "./RecipeDelete";
 
 class RecipeSmallCard extends React.Component {
 
   render() {
-
-
     return (<Card>
-      <Card.Header>
-        <Icon
-            size={0.8}
-            path={mdiPencilOutline}
-            style={{ color: 'orange', cursor: 'pointer' }}
-            onClick={() => this.props.handleAddRecipeShow(this.props.recipe)}
-        />
-      </Card.Header>
       <Card.Img className="card-img-top" alt={this.props.recipe.name} src={this.props.recipe.imgUri}/>
-      <Card.Body >
+      <Card.Body>
         <Card.Title>
           <div className="row no-gutters px-3">
             <div className="col-2 p-1">
@@ -30,7 +21,7 @@ class RecipeSmallCard extends React.Component {
             </div>
           </div>
         </Card.Title>
-        <Card.Text >
+        <Card.Text>
           <div className="row no-gutters px-3">
             <div className="col-2 p-1">
               <Icon className="vertical-align-text-bottom" path={mdiReceipt} size={1} color="grey"/>
@@ -48,6 +39,18 @@ class RecipeSmallCard extends React.Component {
           {this.props.recipe.ingredients.length > 5 && <li className="list-group-item">atd.</li>}
         </ul>
       </Card.Body>
+      <Card.Footer>
+        <div className="d-flex flex-row justify-content-end align-items-center gap-2">
+          <Icon
+              size={0.8}
+              path={mdiPencilOutline}
+              style={{color: 'orange', cursor: 'pointer'}}
+              onClick={() => this.props.handleAddRecipeShow(this.props.recipe)}
+          />
+          <RecipeDelete recipe={this.props.recipe} onDelete={(id) => this.props.onDelete(id)}
+                        onError={(error) => this.props.onError(error)}/>
+        </div>
+      </Card.Footer>
     </Card>);
   }
 }
