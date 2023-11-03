@@ -4,7 +4,7 @@ import RecipeSmallCard from "./RecipeSmallCard";
 
 class RecipeGridList extends React.Component {
   render() {
-    function getRecipeList(recipeList, ingredientList,handleAddRecipeShow,onDelete,onError, isBigCard) {
+    function getRecipeList(recipeList, ingredientList, handleAddRecipeShow,onDelete,onError, isBigCard) {
 
       if (isBigCard) {
         return (<div className="row">

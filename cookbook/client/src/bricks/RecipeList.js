@@ -49,8 +49,7 @@ function RecipeList(props) {
     return (<div className="container">
       {filteredRecipeList.length ? (<div className="container">
         <div className={"d-block d-md-none"}>
-          <RecipeGridList recipeList={filteredRecipeList} ingredientList={props.ingredientList}
-                          isBigCard={false}/>
+          {switchView(ViewState.SMALL_GRID)}
         </div>
         <div className={"d-none d-md-block"}>
           {switchView(viewType)}
@@ -88,7 +87,7 @@ function RecipeList(props) {
                                handleAddRecipeShow={handleUpdateRecipeShow}
                                onDelete={(id) => props.onDelete(id)}
                                onError={(error) => props.onError(error)}
-                               isBigCard={true}/>;
+                               isBigCard={false}/>;
     }
   }
 

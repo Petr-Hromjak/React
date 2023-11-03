@@ -21,9 +21,7 @@ function RecipeFormModal({ingredientList, show, recipe, setAddRecipeShow, onComp
     if (recipe) {
       setFormData({
         name: recipe.name, description: recipe.description, imgUri: recipe.imgUri, ingredients: recipe.ingredients
-      });
-    } else {
-      setFormData(initialFormData);
+      })
     }
   }, [recipe]);
 
@@ -35,7 +33,7 @@ function RecipeFormModal({ingredientList, show, recipe, setAddRecipeShow, onComp
 
   function handleRemoveIngredient(ingredient) {
     return setFormData((formData) => {
-      const newData = {...formData};
+      const newData = JSON.parse(JSON.stringify(formData));
       const index = newData.ingredients.findIndex((savedIngredient) => savedIngredient.id === ingredient.id);
       if (index > -1) {
         newData.ingredients.splice(index, 1);
@@ -179,37 +177,39 @@ function RecipeFormModal({ingredientList, show, recipe, setAddRecipeShow, onComp
                 onChange={(e) => setIngredientsField(e.target.value)}
             >
               <option value="" disabled>Vyber ingredienci k přidání</option>
-              {ingredientList.map((ingredient) => <option key={ingredient.id} value={ingredient.id}>{ingredient.name}</option>)}
+              {ingredientList.map((ingredient) => <option key={ingredient.id}
+                                                          value={ingredient.id}>{ingredient.name}</option>)}
             </Form.Select>
           </Form.Group>
 
           <Form.Label>Ingredience</Form.Label>
-          {formData?.ingredients && formData.ingredients.map((ingredient) => <Row className="d-flex flex-row align-items-center mb-2">
+          {formData?.ingredients && formData.ingredients.map((ingredient) => <Row key={ingredient.id}
+              className="d-flex flex-row align-items-top mb-2">
             <Form.Label
                 className={"col-lg-3 col-form-label fw-bold"}>{ingredientList.find((savedIngredient) => savedIngredient.id === ingredient.id).name}</Form.Label>
             <Form.Group className="col-lg-4">
-              <Row className="d-flex flex-row align-items-center">
+              <Row className="d-flex flex-row align-items-top">
                 <Form.Label className={"col-form-label col-lg-6"}>Množství</Form.Label>
                 <div className="col-lg-6">
                   <Form.Control
                       type="number"
                       value={formData.ingredients.find((savedIngredient) => savedIngredient.id === ingredient.id).amount}
                       placeholder={0}
-                      onChange={(e) => setIngredientAmount(ingredient, e.target.value)}
+                      onChange={(e) => setIngredientAmount(ingredient, parseFloat(e.target.value))}
                       min={0.01}
                       max={10000}
                       step={".01"}
                       required
                   />
                   <Form.Control.Feedback type="invalid">
-                    Zadejte množství v rozsahu 1 - 10000
+                    Zadejte množství v rozsahu 0.01 - 10000
                   </Form.Control.Feedback>
                 </div>
               </Row>
             </Form.Group>
 
             <Form.Group className="col-lg-4">
-              <Row className="d-flex flex-row align-items-center">
+              <Row className="d-flex flex-row align-items-top">
                 <Form.Label className={"col-form-label col-lg-5"}>Jednotky</Form.Label>
                 <div className={"col-lg-7"}>
                   <Form.Select
@@ -225,11 +225,12 @@ function RecipeFormModal({ingredientList, show, recipe, setAddRecipeShow, onComp
               </Row>
             </Form.Group>
 
-            <div className={"col-lg-1"}>
-            <Button className={"w-100 d-flex justify-content-center align-items-center px-1"} variant="btn btn-outline-danger"
-                    onClick={() => handleRemoveIngredient(ingredient)}>
-              <Icon size={1} style={{verticalAlign: "top"}} path={mdiDelete}/>
-            </Button>
+            <div className={"col-lg-1 mt-3 mt-lg-0" }>
+              <Button className={"w-100 d-flex justify-content-center align-items-top px-1"}
+                      variant="btn btn-outline-danger"
+                      onClick={() => handleRemoveIngredient(ingredient)}>
+                <Icon size={1} style={{verticalAlign: "top"}} path={mdiDelete}/>
+              </Button>
             </div>
 
           </Row>)}

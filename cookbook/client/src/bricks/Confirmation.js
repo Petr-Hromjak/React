@@ -37,7 +37,7 @@ export default function Confirmation({ title, message, confirmText, onConfirm, c
       <>
         <OverlayTrigger
             trigger="click"
-            placement="right"
+            placement="left"
             overlay={popover}
             rootClose
         >
